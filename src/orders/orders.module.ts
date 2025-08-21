@@ -1,22 +1,48 @@
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bullmq';
-import { ORDERS_FLOW_PRODUCER, ORDERS_QUEUE_KEY } from '@orders/orders.consts';
+import { MongooseModule } from '@nestjs/mongoose';
+import { ORDERS_QUEUE_KEY } from '@orders/orders.consts';
 import { OrdersEventListener } from '@orders/orders.event-listener';
 import { OrdersProcessor } from '@orders/orders.processor';
+import {
+  ORDER_MODEL_NAME,
+  OrderEntitySchema,
+} from '@shared/schemas/order.schema';
+import { OrderRepository } from '@orders/order.repository';
 import { OrdersService } from './orders.service';
 import { OrdersController } from './orders.controller';
+import { MEALS_QUEUE_KEY } from '@meals/meals.const.dto';
 
 @Module({
   imports: [
     BullModule.registerQueue({
-      // configKey: ORDERS_QUEUE_CONFIG_KEY,
       name: ORDERS_QUEUE_KEY,
+      defaultJobOptions: {
+        priority: 1,
+        attempts: 3,
+        removeOnComplete: true,
+        removeOnFail: true,
+      },
     }),
-    BullModule.registerFlowProducer({
-      name: ORDERS_FLOW_PRODUCER,
+    BullModule.registerQueue({
+      name: MEALS_QUEUE_KEY,
+      defaultJobOptions: {
+        priority: 1,
+        attempts: 3,
+        removeOnComplete: true,
+        removeOnFail: true,
+      },
     }),
+    MongooseModule.forFeature([
+      { name: ORDER_MODEL_NAME, schema: OrderEntitySchema },
+    ]),
   ],
   controllers: [OrdersController],
-  providers: [OrdersService, OrdersEventListener, OrdersProcessor],
+  providers: [
+    OrdersService,
+    OrdersEventListener,
+    OrdersProcessor,
+    OrderRepository,
+  ],
 })
 export class OrdersModule {}

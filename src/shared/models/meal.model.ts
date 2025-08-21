@@ -8,7 +8,6 @@ export enum EMealName {
 }
 
 export class PublicMeal {
-  public id!: string;
   public name!: EMealName;
   public category!: ECategoryName;
   public price!: number;

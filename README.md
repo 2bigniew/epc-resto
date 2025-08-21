@@ -93,11 +93,18 @@ That’s it! Keep the API clear, simple, and easy to expand on.
 9. Add repositories to service
 10. Prepare tests
 11. Refactor
-12. Push and create MR
+[//]: # 12. Push and create MR
+[//]: # 13. Add proper logs
 
 ### Run locally
 
+From root directory
 - Run `npm ci` to install packages
 - Copy `.env.example` to `.env` file
 - Run command `docker compose -f docker-compose.local.yml up --build` to run service and databases in container
 - Visit Swagger on: `http://localhost:3000/docs`
+
+### Troubleshooting
+
+#### Permissions on Linux
+- Run `sudo chmod 777 -R mongo-data` if you face issue `../epc-resto/mongo-data/diagnostic.data: permission denied`
