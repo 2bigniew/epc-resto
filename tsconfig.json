@@ -20,6 +20,7 @@
       "@meals/*": ["src/meals/*"],
       "@orders/*": ["src/orders/*"],
       "@config/*": ["src/config/*"],
+      "@shared/*": ["src/shared/*"],
     }
   },
   "include": ["src"],
