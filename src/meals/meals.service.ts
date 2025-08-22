@@ -1,7 +1,7 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { MealEntity } from '@shared/schemas/meal.schema';
 import { CreateMealPayload, MealsRepository } from '@meals/meals.repository';
-import { EMealName } from '@shared/models/meal.model';
+import { EMealName, PublicMeal } from '@shared/models/meal.model';
 import { ECategoryName } from '@shared/models/category.model';
 import { MealReadResponseDto } from '@meals/dtos/meal-read.dto';
 
@@ -16,6 +16,16 @@ export class MealsService implements OnModuleInit {
      * or by csv import etc.
      */
     await this.initMealDocuments();
+  }
+
+  public async getMealsDetailsByName(
+    mealsNames: EMealName[],
+  ): Promise<{ meals: PublicMeal[]; totalPrice: number }> {
+    const docs = await this.mealsRepository.findAllByMealsNamesList(mealsNames);
+    const meals = this.mapEntitiesToPublicMealsByName(mealsNames, docs);
+    const totalPrice = this.getTotalPriceOfMeals(mealsNames, docs);
+
+    return { meals, totalPrice };
   }
 
   public async findAllByCategoryName({
@@ -71,5 +81,46 @@ export class MealsService implements OnModuleInit {
       category: doc.category,
       price: doc.price / 100,
     };
+  }
+
+  private mapEntitiesToPublicMealsByName(
+    mealNames: EMealName[],
+    docs: MealEntity[],
+  ): PublicMeal[] {
+    const mealsDetails: PublicMeal[] = [];
+
+    for (const meal of mealNames) {
+      const document = docs.find((doc) => doc.name === meal);
+
+      if (document) {
+        mealsDetails.push({
+          name: document.name,
+          category: document.category,
+          price: document.price / 100,
+        });
+      }
+    }
+    return mealsDetails;
+  }
+
+  private getTotalPriceOfMeals(
+    mealNames: EMealName[],
+    docs: MealEntity[],
+  ): number {
+    let totalPrice = 0;
+
+    for (const meal of mealNames) {
+      const document = docs.find((doc) => doc.name === meal);
+
+      if (document) {
+        totalPrice += document.price;
+      }
+    }
+
+    if (totalPrice <= 0) {
+      return 0;
+    }
+
+    return totalPrice / 100;
   }
 }

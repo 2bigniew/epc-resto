@@ -82,19 +82,20 @@ Use Nest.js, and Bull for the queue management.
 That’s it! Keep the API clear, simple, and easy to expand on.
 
 ### TODO:
-1. Setup Bull events flow for orders
-2. Design flow for rest of domains
-3. Setup orders CRUD with validators
-4. Add Service methods
-5. Setup orders event listener and processor
+[//]: # 1. Setup Bull events flow for orders
+[//]: # 2. Design flow for rest of domains
+[//]: # 3. Setup orders CRUD with validators
+[//]: # 4. Add Service methods
+[//]: # 5. Setup orders event listener and processor
 [//]: # (6. Setup categories CRUD )
 [//]: # 7. Setup meals module
 [//]: # (8. Setup repositories and mongodb)
-9. Add repositories to service
+[//]: # 9. Add repositories to service
 10. Prepare tests
 11. Refactor
 [//]: # 12. Push and create MR
-[//]: # 13. Add proper logs
+13. Add proper logs
+14. Add event logs for bull mq flow
 
 ### Run locally
 

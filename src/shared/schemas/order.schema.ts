@@ -28,10 +28,10 @@ export class OrderEntity extends Document<Types.ObjectId> {
   @Prop({ required: true })
   public status!: EOrderStatus;
 
-  @Prop({ required: true })
+  @Prop({ required: false })
   public orderedMeals?: OrderedMeal[];
 
-  @Prop({ required: true })
+  @Prop({ required: false })
   public totalPrice?: number;
 }
 

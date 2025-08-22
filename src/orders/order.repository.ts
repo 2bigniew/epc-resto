@@ -5,8 +5,9 @@ import { ORDER_MODEL_NAME, OrderEntity } from '@shared/schemas/order.schema';
 
 export type TOrderCreatePayload = Pick<OrderEntity, 'orderId' | 'status'>;
 
-export type TOrderUpdateOrderedMealsPayload = Required<
-  Pick<OrderEntity, 'orderedMeals' | 'totalPrice'>
+export type TOrderUpdateOrderedMealsPayload = Pick<
+  OrderEntity,
+  'orderedMeals' | 'status' | 'totalPrice'
 >;
 
 export type TReadFiltersPayload = Partial<
@@ -22,6 +23,18 @@ export class OrderRepository {
 
   public async createOrder(payload: TOrderCreatePayload): Promise<void> {
     await this.model.create(payload);
+  }
+
+  public async updateOrderByFilter(
+    payload: TOrderUpdateOrderedMealsPayload,
+    filtersPayload: TReadFiltersPayload,
+  ): Promise<void> {
+    const filters = this.buildOrderFilters(filtersPayload);
+    await this.model
+      .findOneAndUpdate(filters, {
+        $set: payload,
+      })
+      .exec();
   }
 
   public async findAllByFilters({

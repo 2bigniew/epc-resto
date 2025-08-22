@@ -16,7 +16,7 @@ export class OrdersController {
   async createOrder(@Body() payload: OrderCreateOneRequestDto): Promise<void> {
     const { mealNames } = payload;
 
-    await this.ordersService.createOrder(mealNames);
+    await this.ordersService.startCreateOrderJob(mealNames);
   }
 
   @ApiOperation({ summary: 'Read orders by order status (with pagination)' })

@@ -3,6 +3,7 @@ import { FilterQuery, Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { MEAL_MODEL_NAME, MealEntity } from '@shared/schemas/meal.schema';
 import { ECategoryName } from '@shared/models/category.model';
+import { EMealName } from '@shared/models/meal.model';
 
 export type CreateMealPayload = Pick<MealEntity, 'name' | 'category' | 'price'>;
 
@@ -12,6 +13,15 @@ export class MealsRepository {
     @InjectModel(MEAL_MODEL_NAME)
     private readonly model: Model<MealEntity>,
   ) {}
+
+  public async findAllByMealsNamesList(
+    mealsNames: EMealName[],
+  ): Promise<MealEntity[]> {
+    return this.model
+      .find({ name: { $in: mealsNames } })
+      .lean()
+      .exec();
+  }
 
   public async findAllByFilters({
     limit,

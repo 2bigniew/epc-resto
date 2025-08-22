@@ -6,11 +6,12 @@ import { ORDERS_QUEUE_KEY } from '@orders/orders.consts';
 import { OrderRepository } from '@orders/order.repository';
 import { OrderEntity } from '@shared/schemas/order.schema';
 import {
-  EOrderEventsNames,
-  TOrderEventsMap,
-} from '@shared/events/order.events';
+  CreateOrderJob,
+  EOrderJobNames,
+  TOrderJobsMap,
+} from '@shared/jobs/order.job';
 import { EOrderStatus } from '@shared/models/order.model';
-import { EMealName } from '@shared/models/meal.model';
+import { EMealName, PublicMeal } from '@shared/models/meal.model';
 import { OrderReadResponseDto } from '@orders/dtos/order-read.dto';
 
 @Injectable()
@@ -21,20 +22,50 @@ export class OrdersService {
     private readonly ordersRepository: OrderRepository,
   ) {}
 
-  public async createOrder(mealNames: EMealName[]): Promise<void> {
+  public async startCreateOrderJob(mealNames: EMealName[]): Promise<void> {
     const orderId = this.createOrderId();
-    const status = EOrderStatus.NEW;
 
-    // FIXME add handling errors in controller
-    await this.ordersRepository.createOrder({ orderId, status });
-    const eventName = EOrderEventsNames.ORDER_CREATED;
-    const eventPayload: TOrderEventsMap[EOrderEventsNames.ORDER_CREATED] = {
+    const eventPayload: TOrderJobsMap[EOrderJobNames.CREATE_ORDER] = {
       orderId,
-      status,
       orderedMealsNames: mealNames,
     };
 
+    const eventName = EOrderJobNames.CREATE_ORDER;
+
     await this.ordersQueue.add(eventName, eventPayload);
+  }
+
+  public async createOrder(payload: CreateOrderJob): Promise<void> {
+    const { orderId } = payload;
+    const status = EOrderStatus.NEW;
+    await this.ordersRepository.createOrder({ orderId, status });
+  }
+
+  public async markOrderAsInTheKitchen(orderId: string): Promise<void> {
+    const status = EOrderStatus.IN_THE_KITCHEN;
+    await this.ordersRepository.updateOrderByFilter({ status }, { orderId });
+  }
+
+  public async updateOrderInDeliveryDetails(payload: {
+    orderId: string;
+    orderedMeals: PublicMeal[];
+    totalPrice: number;
+  }): Promise<void> {
+    const status = EOrderStatus.IN_DELIVERY;
+    const { totalPrice, orderedMeals, orderId } = payload;
+    await this.ordersRepository.updateOrderByFilter(
+      {
+        status,
+        orderedMeals,
+        totalPrice,
+      },
+      { orderId },
+    );
+  }
+
+  public async markOrderAsDone(orderId: string): Promise<void> {
+    const status = EOrderStatus.DONE;
+    await this.ordersRepository.updateOrderByFilter({ status }, { orderId });
   }
 
   public async findAllByStatus({
