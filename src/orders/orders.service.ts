@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
-import { Queue } from 'bullmq';
+import { Job, Queue } from 'bullmq';
 import { v4 as uuidv4 } from 'uuid';
 import { ORDERS_QUEUE_KEY } from '@orders/orders.consts';
 import { OrderRepository } from '@orders/order.repository';
@@ -13,6 +13,7 @@ import {
 import { EOrderStatus } from '@shared/models/order.model';
 import { EMealName, PublicMeal } from '@shared/models/meal.model';
 import { OrderReadResponseDto } from '@orders/dtos/order-read.dto';
+import { EJobStatus } from '@orders/dtos/order-queue.read.dto';
 
 @Injectable()
 export class OrdersService {
@@ -116,5 +117,13 @@ export class OrdersService {
 
   private createOrderId(): string {
     return uuidv4();
+  }
+
+  public async listJobsByStatus(
+    status: EJobStatus = EJobStatus.WAITING,
+    start = 0,
+    end = 50,
+  ): Promise<Job[]> {
+    return this.ordersQueue.getJobs([status], start, end, true);
   }
 }

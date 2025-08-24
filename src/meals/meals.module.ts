@@ -19,8 +19,8 @@ import { MEALS_QUEUE_KEY } from '@meals/meals.const.dto';
       defaultJobOptions: {
         priority: 1,
         attempts: 3,
-        removeOnComplete: true,
-        removeOnFail: true,
+        removeOnComplete: false,
+        removeOnFail: false,
       },
     }),
     BullModule.registerQueue({
@@ -28,8 +28,8 @@ import { MEALS_QUEUE_KEY } from '@meals/meals.const.dto';
       defaultJobOptions: {
         priority: 1,
         attempts: 3,
-        removeOnComplete: true,
-        removeOnFail: true,
+        removeOnComplete: false,
+        removeOnFail: false,
       },
     }),
   ],

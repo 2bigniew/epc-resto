@@ -58,42 +58,70 @@ export class OrdersProcessor extends WorkerHost {
   private async handleCreateOrderJob(
     jobPayload: CreateOrderJob,
   ): Promise<void> {
-    await this.ordersService.createOrder(jobPayload);
+    try {
+      await this.ordersService.createOrder(jobPayload);
 
-    const { orderId, orderedMealsNames } = jobPayload;
+      const { orderId, orderedMealsNames } = jobPayload;
 
-    const prepareMealJobPayload: TMealJobsMap[EMealsJobsNames.PREPARE_MEAL] = {
-      orderId,
-      orderedMealsNames,
-    };
+      const prepareMealJobPayload: TMealJobsMap[EMealsJobsNames.PREPARE_MEAL] =
+        {
+          orderId,
+          orderedMealsNames,
+        };
 
-    await this.mealsQueue.add(
-      EMealsJobsNames.PREPARE_MEAL,
-      prepareMealJobPayload,
-    );
+      await this.mealsQueue.add(
+        EMealsJobsNames.PREPARE_MEAL,
+        prepareMealJobPayload,
+      );
+    } catch (e) {
+      this.logger.error(
+        `Error dutring job execution, orderID: ${jobPayload.orderId}, payload: ${JSON.stringify(e)}`,
+      );
+    }
   }
 
   private async handleProcessOrderJob(
     jobPayload: ProcessOrderJob,
   ): Promise<void> {
-    await this.ordersService.markOrderAsInTheKitchen(jobPayload.orderId);
+    try {
+      await this.ordersService.markOrderAsInTheKitchen(jobPayload.orderId);
+    } catch (e) {
+      this.logger.error(
+        `Error dutring job execution, orderID: ${jobPayload.orderId}, payload: ${JSON.stringify(e)}`,
+      );
+    }
   }
 
   private async handleDeliverOrderJob(
     jobPayload: DeliverOrderJob,
   ): Promise<void> {
-    await this.ordersService.updateOrderInDeliveryDetails(jobPayload);
+    try {
+      await this.ordersService.updateOrderInDeliveryDetails(jobPayload);
 
-    const serveMealJobPayload: TMealJobsMap[EMealsJobsNames.SERVE_MEAL] = {
-      orderId: jobPayload.orderId,
-    };
+      const serveMealJobPayload: TMealJobsMap[EMealsJobsNames.SERVE_MEAL] = {
+        orderId: jobPayload.orderId,
+      };
 
-    await this.mealsQueue.add(EMealsJobsNames.SERVE_MEAL, serveMealJobPayload);
+      await this.mealsQueue.add(
+        EMealsJobsNames.SERVE_MEAL,
+        serveMealJobPayload,
+      );
+    } catch (e) {
+      this.logger.error(
+        `Error dutring job execution, orderID: ${jobPayload.orderId}, payload: ${JSON.stringify(e)}`,
+      );
+    }
   }
 
   private async handleCompleteOrderJob(
     jobPayload: CompleteOrderJob,
   ): Promise<void> {
-    await this.ordersService.markOrderAsDone(jobPayload.orderId);
+    try {
+      await this.ordersService.markOrderAsDone(jobPayload.orderId);
+    } catch (e) {
+      this.logger.error(
+        `Error dutring job execution, orderID: ${jobPayload.orderId}, payload: ${JSON.stringify(e)}`,
+      );
+    }
   }
 }

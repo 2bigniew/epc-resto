@@ -10,6 +10,7 @@ import {
 import { OrderRepository } from '@orders/order.repository';
 import { OrdersService } from './orders.service';
 import { OrdersController } from './orders.controller';
+import { OrderQueueController } from '@orders/order.queue.controller';
 import { MEALS_QUEUE_KEY } from '@meals/meals.const.dto';
 
 @Module({
@@ -19,8 +20,8 @@ import { MEALS_QUEUE_KEY } from '@meals/meals.const.dto';
       defaultJobOptions: {
         priority: 1,
         attempts: 3,
-        removeOnComplete: true,
-        removeOnFail: true,
+        removeOnComplete: false,
+        removeOnFail: false,
       },
     }),
     BullModule.registerQueue({
@@ -28,15 +29,15 @@ import { MEALS_QUEUE_KEY } from '@meals/meals.const.dto';
       defaultJobOptions: {
         priority: 1,
         attempts: 3,
-        removeOnComplete: true,
-        removeOnFail: true,
+        removeOnComplete: false,
+        removeOnFail: false,
       },
     }),
     MongooseModule.forFeature([
       { name: ORDER_MODEL_NAME, schema: OrderEntitySchema },
     ]),
   ],
-  controllers: [OrdersController],
+  controllers: [OrdersController, OrderQueueController],
   providers: [OrdersService, OrdersProcessor, OrderRepository],
 })
 export class OrdersModule {}
