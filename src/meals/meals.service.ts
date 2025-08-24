@@ -79,7 +79,7 @@ export class MealsService implements OnModuleInit {
       id: doc._id.toString(),
       name: doc.name,
       category: doc.category,
-      price: doc.price / 100,
+      price: doc.price,
     };
   }
 
@@ -96,7 +96,7 @@ export class MealsService implements OnModuleInit {
         mealsDetails.push({
           name: document.name,
           category: document.category,
-          price: document.price / 100,
+          price: document.price,
         });
       }
     }
@@ -121,6 +121,6 @@ export class MealsService implements OnModuleInit {
       return 0;
     }
 
-    return totalPrice / 100;
+    return totalPrice;
   }
 }

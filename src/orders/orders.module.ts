@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bullmq';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ORDERS_QUEUE_KEY } from '@orders/orders.consts';
-import { OrdersEventListener } from '@orders/orders.event-listener';
 import { OrdersProcessor } from '@orders/orders.processor';
 import {
   ORDER_MODEL_NAME,
@@ -38,11 +37,6 @@ import { MEALS_QUEUE_KEY } from '@meals/meals.const.dto';
     ]),
   ],
   controllers: [OrdersController],
-  providers: [
-    OrdersService,
-    OrdersEventListener,
-    OrdersProcessor,
-    OrderRepository,
-  ],
+  providers: [OrdersService, OrdersProcessor, OrderRepository],
 })
 export class OrdersModule {}
